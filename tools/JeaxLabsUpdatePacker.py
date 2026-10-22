@@ -187,7 +187,7 @@ class UpdatePacker(tk.Tk):
                   activebackground=PURPLE, relief="flat", font=("Segoe UI", 10, "bold"), padx=15, pady=13).pack(side="left", padx=(0, 10))
         tk.Button(buttons, text="GERAR .JXU ASSINADO", command=self._start_pack, bg=PURPLE, fg=WHITE,
                   activebackground="#7040D5", relief="flat", font=("Segoe UI", 11, "bold"), padx=25, pady=13).pack(side="left")
-        tk.Label(panel, text="Selecione o APK novo do JeaxLabs OS. O .jxu valida versão, versionCode, pacote alvo, assinatura e criptografia.\nUse uma chave Ed25519 confiável e nunca publique a chave privada.",
+        tk.Label(panel, text="Selecione o APK novo do JeaxLabs OS. O .jxu valida versão, versionCode, pacote alvo, assinatura e criptografia.\nReutilize a MESMA chave Ed25519 do App Packer; uma chave diferente não passará pelo fingerprint confiável do tablet.",
                  font=("Segoe UI", 9), fg=MUTED, bg=PANEL, justify="left").grid(row=10, column=0, columnspan=3, sticky="w", padx=24, pady=(8, 16))
         footer = tk.Frame(self, bg=BG)
         footer.pack(fill="x", padx=28, pady=(0, 18))
