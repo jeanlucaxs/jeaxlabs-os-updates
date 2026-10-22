@@ -257,9 +257,12 @@ class UpdatePacker(tk.Tk):
                 password, Path(key_path), self.key_password.get())
         threading.Thread(target=self._worker, args=args, daemon=True).start()
 
-    def _worker(self, source, target, version, minimum_version, notes, password, key_path, key_password):
+    def _worker(self, source, target, version, version_code, minimum_version, notes, password, key_path, key_password):
         try:
-            fingerprint, digest = make_update(source, target, version, minimum_version, notes, password, key_path, key_password)
+            fingerprint, digest = make_update(
+                source, target, version, version_code, minimum_version, notes,
+                password, key_path, key_password
+            )
             self.after(0, lambda: self._done(target, fingerprint, digest))
         except Exception as exc:
             self.after(0, lambda error=str(exc): self._error(error))
