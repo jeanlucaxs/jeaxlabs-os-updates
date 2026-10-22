@@ -31,7 +31,7 @@ jobs:
             if (!Number.isSafeInteger(versionCode) || versionCode < 1) throw new Error('Invalid Android versionCode.');
             if (!/^[a-f0-9]{64}$/i.test(sha256)) throw new Error('Invalid SHA-256 checksum.');
             if (!Number.isSafeInteger(sizeBytes) || sizeBytes < 1) throw new Error('Invalid JXU package size.');
-            if (!downloadUrl.startsWith('https://github.com/jeanlucaxs/jeaxlabs-appstore/releases/download/v')) throw new Error('Unexpected APK URL.');
+            if (!downloadUrl.startsWith('https://github.com/jeanlucaxs/jeaxlabs-appstore/releases/download/v')) throw new Error('Unexpected JXU package URL.');
             if (!/^\d{4}-\d\d-\d\dT/.test(publishedAt)) throw new Error('Invalid publication timestamp.');
             const file = 'updates.json';
             const data = JSON.parse(fs.readFileSync(file, 'utf8'));
