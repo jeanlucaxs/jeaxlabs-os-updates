@@ -25,4 +25,4 @@ O aplicativo verifica a impressão digital confiável, a assinatura, o hash, a s
 
 ## Limites atuais
 
-O manifesto é sincronizado automaticamente após a publicação oficial; o fluxo de aplicação de .jxu foi integrado no código Android e ainda precisa passar pelo CI e por teste no tablet físico. Publicar uma versão oficial do APK não transforma o aplicativo em uma ROM/firmware independente.
+O manifesto é sincronizado automaticamente após a publicação oficial; a aplicação de `.jxu` foi integrada no código Android, mas ainda precisa passar pelo CI e por teste no tablet físico. Publicar uma versão oficial do APK não transforma o aplicativo em uma ROM/firmware independente.
