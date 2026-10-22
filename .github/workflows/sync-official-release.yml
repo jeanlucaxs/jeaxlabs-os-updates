@@ -1,0 +1,80 @@
+name: Sync JeaxLabs OS official update manifest
+on:
+  repository_dispatch:
+    types:
+      - jeaxlabs_os_official_release
+permissions:
+  contents: write
+jobs:
+  update-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout updates repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Validate and write official release metadata
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const payload = context.payload.client_payload || {};
+            const version = String(payload.version || '');
+            const versionCode = Number(payload.version_code);
+            const sha256 = String(payload.sha256 || '');
+            const sizeBytes = Number(payload.size_bytes);
+            const downloadUrl = String(payload.download_url || '');
+            const publishedAt = String(payload.published_at || '');
+            const releaseNotes = String(payload.release_notes || '');
+            if (!/^\d+\.\d+\.\d+$/.test(version)) throw new Error('Invalid release version.');
+            if (!Number.isSafeInteger(versionCode) || versionCode < 1) throw new Error('Invalid Android versionCode.');
+            if (!/^[a-f0-9]{64}$/i.test(sha256)) throw new Error('Invalid SHA-256 checksum.');
+            if (!Number.isSafeInteger(sizeBytes) || sizeBytes < 1) throw new Error('Invalid APK size.');
+            if (!downloadUrl.startsWith('https://github.com/jeanlucaxs/jeaxlabs-appstore/releases/download/v')) throw new Error('Unexpected APK URL.');
+            if (!/^\d{4}-\d\d-\d\dT/.test(publishedAt)) throw new Error('Invalid publication timestamp.');
+            const file = 'updates.json';
+            const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+            const versionParts = value => String(value).split('.').map(Number);
+            const compareVersions = (left, right) => {
+              const a = versionParts(left), b = versionParts(right);
+              for (let i = 0; i < 3; i++) {
+                if ((a[i] || 0) > (b[i] || 0)) return 1;
+                if ((a[i] || 0) < (b[i] || 0)) return -1;
+              }
+              return 0;
+            };
+            if (compareVersions(version, data.current_release) < 0) {
+              throw new Error('Refusing to replace a newer update manifest with an older release.');
+            }
+            const update = {
+              version,
+              version_code: versionCode,
+              package_type: 'android-apk',
+              download_url: downloadUrl,
+              sha256,
+              size_bytes: sizeBytes,
+              published_at: publishedAt,
+              release_notes: releaseNotes
+            };
+            if (data.current_release === version && data.update && data.update.sha256 === sha256) {
+              core.info('The same version and checksum are already published; leaving the manifest unchanged.');
+              return;
+            }
+            data.current_release = version;
+            data.updated_at = publishedAt;
+            data.update = update;
+            fs.writeFileSync(file, JSON.stringify(data, null, 2) + '\n');
+      - name: Commit updated manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add updates.json
+          if git diff --cached --quiet; then
+            echo "No manifest changes to commit."
+            exit 0
+          fi
+          VERSION="$(node -p "require('./updates.json').current_release")"
+          git commit -m "release: publish JeaxLabs OS v${VERSION} update metadata"
+          git push origin HEAD:main
