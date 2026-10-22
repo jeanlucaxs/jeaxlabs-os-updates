@@ -24,6 +24,7 @@ jobs:
             const sha256 = String(payload.sha256 || '');
             const sizeBytes = Number(payload.size_bytes);
             const downloadUrl = String(payload.download_url || '');
+            const packageType = String(payload.package_type || 'system-update');
             const publishedAt = String(payload.published_at || '');
             const releaseNotes = String(payload.release_notes || '');
             if (!/^\d+\.\d+\.\d+$/.test(version)) throw new Error('Invalid release version.');
@@ -46,10 +47,13 @@ jobs:
             if (compareVersions(version, data.current_release) < 0) {
               throw new Error('Refusing to replace a newer update manifest with an older release.');
             }
+            if (packageType !== 'system-update' || !downloadUrl.endsWith('.jxu')) {
+              throw new Error('Official OS updates must be signed .jxu packages, not raw APK downloads.');
+            }
             const update = {
               version,
               version_code: versionCode,
-              package_type: 'android-apk',
+              package_type: packageType,
               download_url: downloadUrl,
               sha256,
               size_bytes: sizeBytes,
