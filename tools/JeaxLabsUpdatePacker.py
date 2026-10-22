@@ -99,9 +99,9 @@ def make_update(source: Path, output: Path, version: str, version_code: int,
         raise ValueError("O arquivo selecionado não é um APK Android válido.") from exc
     if not version.strip() or not version_code or version_code < 1:
         raise ValueError("Informe a versão e um versionCode Android positivo.")
-    if not re.fullmatch(r"\\d+\\.\\d+\\.\\d+", version.strip()):
+    if not re.fullmatch(r"\d+\.\d+\.\d+", version.strip()):
         raise ValueError("A versão deve usar o formato X.Y.Z, por exemplo 1.4.1.")
-    if not re.fullmatch(r"\\d+\\.\\d+\\.\\d+", minimum_version.strip()):
+    if not re.fullmatch(r"\d+\.\d+\.\d+", minimum_version.strip()):
         raise ValueError("A versão mínima deve usar o formato X.Y.Z, por exemplo 1.4.0.")
     if len(password) < 8:
         raise ValueError("Use pelo menos 8 caracteres na senha de criptografia.")
@@ -115,7 +115,7 @@ def make_update(source: Path, output: Path, version: str, version_code: int,
     encrypted = AESGCM(derive_key(password, salt)).encrypt(nonce, plain, aad)
     manifest = {
         "format": "JXU", "format_version": FORMAT_VERSION, "product": "JeaxLabs OS",
-        "package_type": "system-update", "product": "JeaxLabs OS",
+        "package_type": "system-update",
         "target_package": "br.com.jeaxlabs.os", "version": version.strip(),
         "version_code": int(version_code), "minimum_version": minimum_version.strip(),
         "release_notes": notes.strip(),
