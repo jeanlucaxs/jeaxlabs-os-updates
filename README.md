@@ -1,28 +1,21 @@
 # JeaxLabs OS Updates
 
-Repositório oficial do manifesto de atualizações e da ferramenta Python que empacota pacotes `.jxu`.
-
-## Política de versões
-
-Toda versão numerada publicada é tratada como versão oficial do JeaxLabs OS. Não publicar produto como beta, preview ou release candidate. O repositório principal `jeaxlabs-appstore` assina e publica cada versão oficial; esta workflow recebe o evento autenticado de publicação e atualiza `updates.json` automaticamente.
+Repositório público com o manifesto de atualizações do JeaxLabs OS e a pasta pública destinada a pacotes JXA da Store.
 
 ## Arquivos
 
-- `updates.json`: manifesto público da versão mais recente publicada.
-- `tools/JeaxLabsUpdatePacker.py`: empacotador de atualizações `.jxu`.
+- `updates.json`: manifesto da versão oficial mais recente do JeaxLabs OS.
 - `.github/workflows/sync-official-release.yml`: valida e grava metadados recebidos do repositório principal.
-- `packages/`: espaço reservado para pacotes `.jxu`.
+- `packages/`: espaço reservado para arquivos de app publicados em versões antigas; a Store atual usa `packages/` no repositório `jeaxlabs-appstore`.
 
-O manifesto atualizado inclui versão, versionCode Android, URL de download do pacote criptografado `.jxu`, SHA-256, tamanho, data de publicação e notas. O workflow rejeita versões fora do formato SemVer, checksums inválidos e tentativas de substituir uma versão mais recente por uma mais antiga.
+## Segurança e publicação
 
-## Integração e segurança
+O repositório principal `jeaxlabs-appstore` gera o pacote de atualização `.jxu` no runner de release e sincroniza aqui os metadados. Não há utilitários Python de empacotamento distribuídos na árvore pública.
 
-No repositório principal, configurar o secret `UPDATES_REPO_TOKEN` com permissão de escrita suficiente para disparar `repository_dispatch` neste repositório. O token não deve ser armazenado no código nem no manifesto.
+Não armazene chaves privadas, senhas ou tokens neste repositório. A Store de aplicativos usa o repositório público `jeaxlabs-appstore/packages/` porque o tablet consulta o catálogo sem token incorporado no APK.
 
-Não armazenar chaves privadas, senhas ou tokens neste repositório. O empacotador GUI e o CLI `tools/JeaxLabsJxuCli.py` geram o mesmo formato `.jxu`, que contém a nova APK do JeaxLabs OS cifrada com AES-256-GCM e assinada com Ed25519.
+O aplicativo verifica assinatura, integridade e versão antes de encaminhar uma atualização ao instalador Android. O sistema pode exigir confirmação, e a substituição depende do certificado Android da instalação existente e de um versionCode maior.
 
-O aplicativo verifica a impressão digital confiável, a assinatura, o hash, a senha, o pacote Android de destino, a versão e o versionCode antes de solicitar a instalação. A atualização substitui a instalação existente apenas quando o novo APK foi assinado pelo mesmo certificado Android e tem versionCode maior. A confirmação final depende das permissões de gerenciamento permitidas pelo próprio Android.
+## Limites
 
-## Limites atuais
-
-O manifesto é sincronizado automaticamente após a publicação oficial; a aplicação de `.jxu` foi integrada no código Android, mas ainda precisa passar pelo CI e por teste no tablet físico. Publicar uma versão oficial do APK não transforma o aplicativo em uma ROM/firmware independente.
+O JeaxLabs OS é um launcher/kiosk sobre Android, não uma ROM/firmware independente. A compilação e a instalação em tablet físico precisam ser validadas separadamente.
